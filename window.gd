@@ -1,9 +1,11 @@
 extends Node2D
 
+var window
+
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	# Get access to the actual OS Window (not just the game node)
-	var window = get_window()
+	window = get_window()
 
 	# 1. TRANSPARENCY SETUP
 	# We enable transparency for both the Godot Viewport and the OS Window
@@ -19,3 +21,9 @@ func _ready() -> void:
 
 	# Force Windows to relax and let us be borderless
 	window.unresizable = false
+	
+func MoveWindowTo(position: Vector2) -> void:
+	window.position = position
+	
+func get_window_position() -> Vector2:
+	return window.position

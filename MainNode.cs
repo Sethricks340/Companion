@@ -1,9 +1,6 @@
 using Godot;
 using System;
 
-
-
-
 public partial class MainNode : Node2D
 {
 	//GD.Print("Hello, world!");
@@ -11,15 +8,18 @@ public partial class MainNode : Node2D
 	private Vector2 offset;
 	private Node2D parentScript;
 	private Sprite2D _cat;
+	private Node window_inst;
 	
 	public override void _Ready()
 	{
 		//if ((GetParent() as Node2D) == null) GD.Print("parent is null");
 		_cat = GetNode<Sprite2D>("Cat");
 			
-		var script = (GDScript)GD.Load("res://window.gd");
-		var instance = (Node)script.New();
-		AddChild(instance);
+		var window_script = (GDScript)GD.Load("res://window.gd");
+		window_inst = (Node)window_script.New();
+		AddChild(window_inst);
+
+		//window_inst.Call("MoveWindowTo", new Vector2(0, 0));
 	}
 
 	public override void _Input(InputEvent @event)
@@ -32,13 +32,15 @@ public partial class MainNode : Node2D
 				{
 					// Check if mouse is over the sprite
 					Vector2 mousePos = GetGlobalMousePosition();
+					GD.Print("mousePos: " + mousePos);
 					Rect2 localRect = _cat.GetRect();            
 					Rect2 globalRect = new Rect2(_cat.GlobalPosition + localRect.Position, localRect.Size);
-
+					GD.Print("globalRect: " + globalRect);
+					
 					if (globalRect.HasPoint(mousePos))
 					{
 						dragging = true;
-						offset = _cat.GlobalPosition - mousePos;
+						offset = (Vector2)window_inst.Call("get_window_position") - mousePos;
 					}
 				}
 				else
@@ -53,7 +55,7 @@ public partial class MainNode : Node2D
 	{		
 		if (dragging)
 		{
-			_cat.GlobalPosition = GetGlobalMousePosition() + offset;
+			window_inst.Call("MoveWindowTo", GetGlobalMousePosition() + offset);
 		}
 	}
 }
