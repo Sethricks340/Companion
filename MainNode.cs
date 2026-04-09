@@ -5,7 +5,9 @@ public partial class MainNode : Node2D
 {
 	private bool dragging = false;
 	private Vector2 offset;
+	private Vector2 mousePos ;
 	private Node window_inst;
+	private Rect2 globalRect;
 
 	public override void _Ready()
 	{
@@ -20,8 +22,8 @@ public partial class MainNode : Node2D
 		{
 			if (mouseEvent.Pressed)
 			{
-				Vector2 mousePos = DisplayServer.MouseGetPosition();
-				Rect2 globalRect = new Rect2((Vector2)window_inst.Call("get_window_position"), new Vector2(130, 130));
+				mousePos = DisplayServer.MouseGetPosition();
+				globalRect = new Rect2((Vector2)window_inst.Call("get_window_position"), new Vector2(130, 130));
 
 				if (globalRect.HasPoint(mousePos))
 				{
@@ -40,8 +42,8 @@ public partial class MainNode : Node2D
 	{
 		if (dragging)
 		{
-			Vector2 mousePos = DisplayServer.MouseGetPosition();
+			mousePos = DisplayServer.MouseGetPosition();
 			window_inst.Call("MoveWindowTo", mousePos + offset);
 		}
-	}
+	}	
 }
