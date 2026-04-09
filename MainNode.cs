@@ -6,6 +6,7 @@ public partial class MainNode : Node2D
 	private bool dragging = false;
 	private Vector2 offset;
 	private Vector2 mousePos ;
+	private Vector2 windowPos;
 	private Node window_inst;
 	private Rect2 globalRect;
 
@@ -23,12 +24,13 @@ public partial class MainNode : Node2D
 			if (mouseEvent.Pressed)
 			{
 				mousePos = DisplayServer.MouseGetPosition();
-				globalRect = new Rect2((Vector2)window_inst.Call("get_window_position"), new Vector2(130, 130));
+				windowPos = (Vector2)window_inst.Call("get_window_position");
+				globalRect = new Rect2(windowPos, new Vector2(125, 105)); // Current Window Size
 
 				if (globalRect.HasPoint(mousePos))
 				{
 					dragging = true;
-					offset = (Vector2)window_inst.Call("get_window_position") - mousePos;
+					offset = windowPos - mousePos;
 				}
 			}
 			else
