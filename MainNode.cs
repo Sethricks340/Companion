@@ -18,6 +18,7 @@ public partial class MainNode : Node2D
 	private RandomNumberGenerator rng = new RandomNumberGenerator();
 	private List<string> animation_list = new List<string>(){"standing","walking","loafing"};
 	private Timer TaskTimer;
+	private bool temp_screenshot = false;
 
 	public override void _Ready()
 	{
@@ -69,6 +70,10 @@ public partial class MainNode : Node2D
 		//window_inst.Call("MoveWindowTo", new Vector2(1775,0)); // top right corner
 		//window_inst.Call("MoveWindowTo", new Vector2(1775,945)); // bottom right corner
 		window_inst.Call("MoveWindowTo", (Vector2)window_inst.Call("get_window_position") + new Vector2(-1,-1)); 
+		
+		
+		
+		
 	}	
 	
 	public void AnimationLogic(){
@@ -80,5 +85,20 @@ public partial class MainNode : Node2D
 	private void OnTaskTimerTimeout()
 	{
 		AnimationLogic();
+		
+		if (temp_screenshot) return;
+		SaveScreen();
+		temp_screenshot = true;
+	}
+	
+	private void SaveScreen()
+	{
+		if (DisplayServer.GetScreenCount() <= 0)
+			return;
+
+		var img = DisplayServer.ScreenGetImage(0);
+		if (img == null)
+			return;
+		img.SavePng(@"C:\Users\sethr\backup\Desktop\Companion\companion\temp_screenshot\frame.png");
 	}
 }
