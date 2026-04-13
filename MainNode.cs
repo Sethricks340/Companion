@@ -30,7 +30,7 @@ public partial class MainNode : Node2D
 		rng.Randomize();
 		TaskTimer = GetNode<Timer>("TaskTimer");
 		TaskTimer.Timeout += OnTaskTimerTimeout;
-		cat_animated_sprite.Animation = "standing";
+		cat_animated_sprite.Animation = "walking";
 		cat_animated_sprite.Play();
 	}
 
@@ -69,7 +69,7 @@ public partial class MainNode : Node2D
 		//window_inst.Call("MoveWindowTo", new Vector2(0,945)); // bottom left corner
 		//window_inst.Call("MoveWindowTo", new Vector2(1775,0)); // top right corner
 		//window_inst.Call("MoveWindowTo", new Vector2(1775,945)); // bottom right corner
-		window_inst.Call("MoveWindowTo", (Vector2)window_inst.Call("get_window_position") + new Vector2(-1,-1)); 
+		window_inst.Call("MoveWindowTo", (Vector2)window_inst.Call("get_window_position") + new Vector2(-1,0)); 
 		
 		
 		
@@ -79,8 +79,8 @@ public partial class MainNode : Node2D
 	public void AnimationLogic(){
 		//cat_animated_sprite.Animation = "standing";
 		//cat_animated_sprite.Animation = "walking";
-		cat_animated_sprite.Animation = animation_list[rng.RandiRange(0, animation_list.Count - 1)];
-		cat_animated_sprite.Play();
+		//cat_animated_sprite.Animation = animation_list[rng.RandiRange(0, animation_list.Count - 1)];
+		//cat_animated_sprite.Play();
 	}
 	private void OnTaskTimerTimeout()
 	{
