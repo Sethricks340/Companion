@@ -73,16 +73,8 @@ public partial class MainNode : Node2D
 			mousePos = DisplayServer.MouseGetPosition();
 			window_inst.Call("MoveWindowTo", mousePos + offset);
 		}
-		// (-1,0) -> left // (1,0) -> right // (0,1) -> down // (0,-1) -> up
-		//window_inst.Call("MoveWindowTo", new Vector2(0,0)); // top left corner
-		//window_inst.Call("MoveWindowTo", new Vector2(0,945)); // bottom left corner
-		//window_inst.Call("MoveWindowTo", new Vector2(1775,0)); // top right corner
-		//window_inst.Call("MoveWindowTo", new Vector2(1775,945)); // bottom right corner
+		// +(-1,0) -> left // +(1,0) -> right // +(0,1) -> down // +(0,-1) -> up
 		window_inst.Call("MoveWindowTo", (Vector2)window_inst.Call("get_window_position") + new Vector2(-1,0)); 
-		
-		
-		
-		
 	}	
 	
 	public void AnimationLogic(){
