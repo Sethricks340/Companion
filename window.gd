@@ -1,13 +1,10 @@
 extends Node2D
 
 var window
-var top_left = Vector2(0, 0)
-var bottom_left = Vector2(0, 945)
-var top_right = Vector2(1775, 0)
-var bottom_right = Vector2(1775, 945)
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
+	
 	# Get access to the actual OS Window (not just the game node)
 	window = get_window()
 
@@ -27,8 +24,13 @@ func _ready() -> void:
 	window.unresizable = false
 	
 func MoveWindowTo(position: Vector2) -> void:
-	position.x = clamp(position.x, top_left.x, top_right.x)
-	position.y = clamp(position.y, top_left.y, bottom_left.y)
+	var screen_size = Vector2(DisplayServer.screen_get_size(DisplayServer.get_primary_screen()))
+	var window_size = Vector2(window.size)
+
+	var max_pos = screen_size - window_size
+	#print(max_pos)
+
+	position = position.clamp(Vector2.ZERO, max_pos)
 
 	window.position = position
 	
