@@ -24,10 +24,10 @@ func _ready() -> void:
 	window.unresizable = false
 	
 func MoveWindowTo(position: Vector2) -> void:
-	var screen_size = Vector2(DisplayServer.screen_get_size(DisplayServer.get_primary_screen()))
-	var window_size = Vector2(window.size)
+	#var screen_size = Vector2(DisplayServer.screen_get_size(DisplayServer.get_primary_screen()))
+	#var window_size = Vector2(window.size)
 
-	var max_pos = screen_size - window_size
+	var max_pos = get_display_size()
 	#print(max_pos)
 
 	position = position.clamp(Vector2.ZERO, max_pos)
@@ -36,3 +36,10 @@ func MoveWindowTo(position: Vector2) -> void:
 	
 func get_window_position() -> Vector2:
 	return window.position
+	
+func get_display_size() -> Vector2:
+	var screen_size = Vector2(DisplayServer.screen_get_size(DisplayServer.get_primary_screen()))
+	var window_size = Vector2(window.size)
+
+	var max_pos = screen_size - window_size
+	return max_pos

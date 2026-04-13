@@ -11,10 +11,10 @@ public partial class MainNode : Node2D
 	private Node window_inst;
 	private Rect2 globalRect;
 	private AnimatedSprite2D cat_animated_sprite;
-	private Vector2 top_left  = new Vector2(0,0);
-	private Vector2 bottom_left  = new Vector2(0,945);
-	private Vector2 top_right  = new Vector2(1775,0);
-	private Vector2 bottom_right  = new Vector2(1775,945);
+	private Vector2 top_left;
+	private Vector2 bottom_left;
+	private Vector2 top_right;
+	private Vector2 bottom_right;
 	private RandomNumberGenerator rng = new RandomNumberGenerator();
 	private List<string> animation_list = new List<string>(){"standing","walking","loafing"};
 	private Timer TaskTimer;
@@ -25,7 +25,16 @@ public partial class MainNode : Node2D
 		var window_script = (GDScript)GD.Load("res://window.gd");
 		window_inst = (Node)window_script.New();
 		AddChild(window_inst);
+		
+		Vector2 max_pos = window_inst.Call("get_display_size").AsVector2();
+		
+		top_left = new Vector2(0,0);
+		bottom_left = new Vector2(0,max_pos.Y);
+		top_right = new Vector2(max_pos.X,0);
+		bottom_right = new Vector2(max_pos.X,max_pos.Y);
+		
 		window_inst.Call("MoveWindowTo", bottom_right); 
+		
 		cat_animated_sprite = GetNode<AnimatedSprite2D>("cat");
 		rng.Randomize();
 		TaskTimer = GetNode<Timer>("TaskTimer");
