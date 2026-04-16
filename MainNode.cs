@@ -147,6 +147,7 @@ public partial class MainNode : Node2D
 			}
 			
 			// If the pixel count for a color is under the threshold, leave it out
+			// TODO: getting weird curves with split screens
 			int pixel_count_threshold = 10000; //(WAS 1000)
 			foreach (var key in new List<int>(groups.Keys))
 			{
