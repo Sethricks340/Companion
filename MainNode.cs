@@ -3,6 +3,12 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 
+class PixelGroup
+{
+	public int Count = 0;
+	public List<Vector2> Positions = new List<Vector2>();
+}
+
 public partial class MainNode : Node2D
 {
 	private bool dragging = false;
@@ -19,7 +25,8 @@ public partial class MainNode : Node2D
 	private RandomNumberGenerator rng = new RandomNumberGenerator();
 	private List<string> animation_list = new List<string>(){"standing","walking","loafing"};
 	private Godot.Timer TaskTimer;
-	private bool temp_screenshot = false;
+	private Color[] pixels;
+	private Dictionary<int, PixelGroup> groups = new Dictionary<int, PixelGroup>();
 
 	public override void _Ready()
 	{
@@ -43,6 +50,10 @@ public partial class MainNode : Node2D
 		cat_animated_sprite.Animation = "walking";
 		cat_animated_sprite.Play();
 		
+		var img = DisplayServer.ScreenGetImage(0);
+		pixels = new Color[img.GetWidth() * img.GetHeight()];
+		
+		// Save Screen is in a new thread so it doesn't interrupt the animations
 		Thread thread = new Thread(new ThreadStart(SaveScreen));
 		thread.Start();
 	}
@@ -86,6 +97,7 @@ public partial class MainNode : Node2D
 		AnimationLogic();
 	}
 	public void AnimationLogic(){
+		// TODO: right now it is just set to walking, will need to change animations
 		//cat_animated_sprite.Animation = "standing";
 		//cat_animated_sprite.Animation = "walking";
 		//cat_animated_sprite.Animation = animation_list[rng.RandiRange(0, animation_list.Count - 1)];
@@ -93,17 +105,80 @@ public partial class MainNode : Node2D
 	}
 	private void SaveScreen()
 	{
-		int count = 0;
-		while (true){
+		System.Threading.Thread.Sleep(500); //wait till cat is loaded
+
+			// Make sure there is a screen
 			if (DisplayServer.GetScreenCount() <= 0)
 				return;
 
+			// Make sure image is valid
 			var img = DisplayServer.ScreenGetImage(0);
 			if (img == null)
 				return;
+			
+			// Temp save original image
 			img.SavePng(@"C:\Users\sethr\backup\Desktop\Companion\companion\temp_screenshot\frame.png");
-			//img.SavePng($@"C:\Users\sethr\backup\Desktop\Companion\companion\temp_screenshot\frame{count}.png");
-			GD.Print("hi " + ++count);
-		}
+			
+			// Get image width and height (screenshot of whole screen, NOT just godot window)
+			//GD.Print("Image Height x Width: " + img.GetHeight() + " x " + img.GetWidth()); // My Output: Image Height x Width: 1080 x 1920
+			int w = img.GetWidth();
+			int h = img.GetHeight();
+
+			for (int y = 1; y < h - 1; y++){
+				for (int x = 1; x < w - 1; x++){
+					// for each pixel in the image, get the raw pixel values. (R,G,B,A) (A = transparency)
+					Color c = img.GetPixel(x, y);
+					// Store in the one dimensional array
+					pixels[y * w + x] = c;
+
+					// This clusters similar colors together. 512 total combos
+					int r = (int)(c.R * 8); 
+					int g = (int)(c.G * 8);
+					int b = (int)(c.B * 8);
+
+					int key = (r << 16) | (g << 8) | b; // Combine the rgb information into one key
+
+					// No duplicate keys
+					if (!groups.ContainsKey(key)) groups[key] = new PixelGroup();
+
+					groups[key].Count++; // Increase the number of this color found
+					groups[key].Positions.Add(new Vector2(x, y)); // Add the position of this pixel to this dictionary key
+				}
+			}
+			
+			// If the pixel count for a color is under 1000, leave it out
+			int pixel_count_threshold = 1000;
+			foreach (var key in new List<int>(groups.Keys))
+			{
+				if (groups[key].Count < pixel_count_threshold)
+				{
+					groups.Remove(key);
+				}
+			}
+			
+			// TODO: this is temp, to visualize the success of this. 
+			// Display all the items in the pixel dictionary
+			int count = 0;
+			foreach (var kv in groups)
+			{
+				GD.Print("Index: " + count++ + " Key: " + kv.Key + " Count: " + kv.Value.Count);
+			}
+			GD.Print("Total # of groups: " + groups.Count);
+
+			// TODO: this is temp, to visualize the success of this. 
+			// We are reconstructing a new image for each significant color, white on a black background
+			for (int image_index = 0; image_index < groups.Count; image_index++){
+				int targetKey = new List<int>(groups.Keys)[image_index];
+				
+				Image newImg = Image.Create(w, h, false, Image.Format.Rgba8);
+				newImg.Fill(Colors.Black);
+
+				// Reconstruct a rough image from this color
+				foreach (var p in groups[targetKey].Positions)
+				{
+					newImg.SetPixel((int)p.X, (int)p.Y, Colors.White);
+				}
+				newImg.SavePng($@"C:\Users\sethr\backup\Desktop\Companion\companion\temp_screenshot\frame_filter{image_index}.png");
+			}
 	}
 }
