@@ -147,7 +147,7 @@ public partial class MainNode : Node2D
 			}
 			
 			// If the pixel count for a color is under the threshold, leave it out
-			int pixel_count_threshold = 10000; (WAS 1000)
+			int pixel_count_threshold = 10000; //(WAS 1000)
 			foreach (var key in new List<int>(groups.Keys))
 			{
 				if (groups[key].Count < pixel_count_threshold)
