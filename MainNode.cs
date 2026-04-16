@@ -124,8 +124,8 @@ public partial class MainNode : Node2D
 			int w = img.GetWidth();
 			int h = img.GetHeight();
 
-			for (int y = 1; y < h - 1; y++){
-				for (int x = 1; x < w - 1; x++){
+			for (int y = 1; y < h; y++){
+				for (int x = 1; x < w; x++){
 					// for each pixel in the image, get the raw pixel values. (R,G,B,A) (A = transparency)
 					Color c = img.GetPixel(x, y);
 					// Store in the one dimensional array
@@ -146,40 +146,36 @@ public partial class MainNode : Node2D
 				}
 			}
 			
-			// If the pixel count for a color is under the threshold, leave it out
-			// TODO: getting weird curves with split screens
-			int pixel_count_threshold = 10000; //(WAS 1000)
-			foreach (var key in new List<int>(groups.Keys))
-			{
-				if (groups[key].Count < pixel_count_threshold)
-				{
-					groups.Remove(key);
-				}
-			}
-			
 			// TODO: this is temp, to visualize the success of this. 
-			// Display all the items in the pixel dictionary
+			// TODO: getting weird curves with split screens
+			// If the pixel count for a color is under the threshold, leave it out
 			int count = 0;
+			int pixel_count_threshold = 100000;
 			foreach (var kv in groups)
 			{
-				GD.Print("Index: " + count++ + " Key: " + kv.Key + " Count: " + kv.Value.Count);
-			}
-			GD.Print("Total # of groups: " + groups.Count);
-
-			// TODO: this is temp, to visualize the success of this. 
-			// We are reconstructing a new image for each significant color, white on a black background
-			for (int image_index = 0; image_index < groups.Count; image_index++){
-				int targetKey = new List<int>(groups.Keys)[image_index];
-				
-				Image newImg = Image.Create(w, h, false, Image.Format.Rgba8);
-				newImg.Fill(Colors.Black);
-
-				// Reconstruct a rough image from this color
-				foreach (var p in groups[targetKey].Positions)
-				{
-					newImg.SetPixel((int)p.X, (int)p.Y, Colors.White);
+				if (kv.Value.Count < pixel_count_threshold){
+					groups.Remove(kv.Key);
 				}
-				newImg.SavePng($@"C:\Users\sethr\backup\Desktop\Companion\companion\temp_screenshot\frame_filter{image_index}.png");
+				else{
+					GD.Print("Index: " + count + " Key: " + kv.Key + " Count: " + kv.Value.Count);
+					
+			 		//We are reconstructing a new image for each significant color, white on a black background
+					int targetKey = new List<int>(groups.Keys)[count];
+					
+					Image newImg = Image.Create(w, h, false, Image.Format.Rgba8);
+					newImg.Fill(Colors.Black);
+
+					// Reconstruct a rough image from this color
+					foreach (var p in groups[targetKey].Positions)
+					{
+						newImg.SetPixel((int)p.X, (int)p.Y, Colors.White);
+					}
+					// This new image is still 1080 x 1920 pixels
+					newImg.SavePng($@"C:\Users\sethr\backup\Desktop\Companion\companion\temp_screenshot\frame_filter{count}.png");
+					
+					count++;
+				}
 			}
+			GD.Print($"Total # groups over {pixel_count_threshold} pixels: " + groups.Count); 
 	}
 }
