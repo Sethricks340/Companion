@@ -316,8 +316,6 @@ public partial class MainNode : Node2D
 					}
 					filteredImg.SavePng($@"C:\Users\sethr\backup\Desktop\Companion\companion\temp_screenshot\frame_edges_filtered_final{count}.png");
 					
-					// TODO: need to know the location(s) of line(s)
-					
 					count++;
 				}
 			}
@@ -327,5 +325,7 @@ public partial class MainNode : Node2D
 			{
 				GD.Print("line center #" + i + ": " + lineCenters[i]);
 			}
+			
+			// TODO: use the loafpoints to move the cat to one of these random points and loaf on it
 	}
 }
