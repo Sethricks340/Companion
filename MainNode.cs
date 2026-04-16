@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 
 public partial class MainNode : Node2D
 {
@@ -17,7 +18,7 @@ public partial class MainNode : Node2D
 	private Vector2 bottom_right;
 	private RandomNumberGenerator rng = new RandomNumberGenerator();
 	private List<string> animation_list = new List<string>(){"standing","walking","loafing"};
-	private Timer TaskTimer;
+	private Godot.Timer TaskTimer;
 	private bool temp_screenshot = false;
 
 	public override void _Ready()
@@ -37,10 +38,13 @@ public partial class MainNode : Node2D
 		
 		cat_animated_sprite = GetNode<AnimatedSprite2D>("cat");
 		rng.Randomize();
-		TaskTimer = GetNode<Timer>("TaskTimer");
+		TaskTimer = GetNode<Godot.Timer>("TaskTimer");
 		TaskTimer.Timeout += OnTaskTimerTimeout;
 		cat_animated_sprite.Animation = "walking";
 		cat_animated_sprite.Play();
+		
+		Thread thread = new Thread(new ThreadStart(SaveScreen));
+		thread.Start();
 	}
 
 	public override void _Input(InputEvent @event)
@@ -77,29 +81,29 @@ public partial class MainNode : Node2D
 		window_inst.Call("MoveWindowTo", (Vector2)window_inst.Call("get_window_position") + new Vector2(-1,0)); 
 	}	
 	
+	private void OnTaskTimerTimeout()
+	{
+		AnimationLogic();
+	}
 	public void AnimationLogic(){
 		//cat_animated_sprite.Animation = "standing";
 		//cat_animated_sprite.Animation = "walking";
 		//cat_animated_sprite.Animation = animation_list[rng.RandiRange(0, animation_list.Count - 1)];
 		//cat_animated_sprite.Play();
 	}
-	private void OnTaskTimerTimeout()
-	{
-		AnimationLogic();
-		
-		if (temp_screenshot) return;
-		SaveScreen();
-		temp_screenshot = true;
-	}
-	
 	private void SaveScreen()
 	{
-		if (DisplayServer.GetScreenCount() <= 0)
-			return;
+		int count = 0;
+		while (true){
+			if (DisplayServer.GetScreenCount() <= 0)
+				return;
 
-		var img = DisplayServer.ScreenGetImage(0);
-		if (img == null)
-			return;
-		img.SavePng(@"C:\Users\sethr\backup\Desktop\Companion\companion\temp_screenshot\frame.png");
+			var img = DisplayServer.ScreenGetImage(0);
+			if (img == null)
+				return;
+			img.SavePng(@"C:\Users\sethr\backup\Desktop\Companion\companion\temp_screenshot\frame.png");
+			//img.SavePng($@"C:\Users\sethr\backup\Desktop\Companion\companion\temp_screenshot\frame{count}.png");
+			GD.Print("hi " + ++count);
+		}
 	}
 }
