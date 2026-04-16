@@ -27,7 +27,6 @@ public partial class MainNode : Node2D
 	private Godot.Timer TaskTimer;
 	private Color[] pixels;
 	private Dictionary<int, PixelGroup> groups = new Dictionary<int, PixelGroup>();
-	private List<Vector2> lineCenters = new List<Vector2>();
 
 	public override void _Ready()
 	{
@@ -122,9 +121,18 @@ public partial class MainNode : Node2D
 			
 			// Get image width and height (screenshot of whole screen, NOT just godot window)
 			//GD.Print("Image Height x Width: " + img.GetHeight() + " x " + img.GetWidth()); // My Output: Image Height x Width: 1080 x 1920
-			int w = img.GetWidth();
+			int w = img.GetWidth();1
 			int h = img.GetHeight();
-
+			List<Vector2> lineCenters = FindHorizontalLineCenters(w, h, img);
+			// Print line centers debug
+			for (int i = 0; i < lineCenters.Count; i++){
+				GD.Print("line center #" + i + ": " + lineCenters[i]);
+			}
+	}
+	
+	private List<Vector2> FindHorizontalLineCenters(int w, int h, Image img){
+		List<Vector2> lineCenters = new List<Vector2>();
+		
 			for (int y = 1; y < h; y++){
 				for (int x = 1; x < w; x++){
 					// for each pixel in the image, get the raw pixel values. (R,G,B,A) (A = transparency)
@@ -147,19 +155,42 @@ public partial class MainNode : Node2D
 				}
 			}
 			
+			// Remove all but the largest color in dictionary
+			int largestKey = -1;
+			int largestCount = 0;
+
+			foreach (var kv in groups){
+				if (kv.Value.Count > largestCount)
+				{
+					largestCount = kv.Value.Count;
+					largestKey = kv.Key;
+				}
+			}
+
+			var keysToRemove = new List<int>();
+
+			foreach (var kv in groups){
+				if (kv.Key != largestKey)
+					keysToRemove.Add(kv.Key);
+			}
+
+			foreach (var k in keysToRemove){
+				groups.Remove(k);
+			}
+			
 			// TODO: this is temp, to visualize the success of this. 
 			// TODO: getting weird curves with split screens
 			// TODO: maybe only use the largest group for speed
 			// If the pixel count for a color is under the threshold, leave it out
 			int count = 0;
 			int pixel_count_threshold = 100000;
-			foreach (var kv in groups)
-			{
+			foreach (var kv in groups){
 				if (kv.Value.Count < pixel_count_threshold){
 					groups.Remove(kv.Key);
+					// return // What if there are none over 100,000
 				}
 				else{
-					GD.Print("Index: " + count + " Key: " + kv.Key + " Count: " + kv.Value.Count);
+					//GD.Print("Index: " + count + " Key: " + kv.Key + " Count: " + kv.Value.Count);
 					
 			 		//We are reconstructing a new image for each significant color, white on a black background
 					int targetKey = new List<int>(groups.Keys)[count];
@@ -319,13 +350,16 @@ public partial class MainNode : Node2D
 					count++;
 				}
 			}
-			GD.Print($"Total # groups over {pixel_count_threshold} pixels: " + groups.Count); 
+			//GD.Print($"Total # groups over {pixel_count_threshold} pixels: " + groups.Count); 
 			
-			for (int i = 0; i < lineCenters.Count; i++)
-			{
-				GD.Print("line center #" + i + ": " + lineCenters[i]);
-			}
+			//// Print line centers debug
+			//for (int i = 0; i < lineCenters.Count; i++){
+				//GD.Print("line center #" + i + ": " + lineCenters[i]);
+			//}
 			
 			// TODO: use the loafpoints to move the cat to one of these random points and loaf on it
+
+
+			return lineCenters;
 	}
 }
