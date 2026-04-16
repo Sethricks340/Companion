@@ -27,6 +27,7 @@ public partial class MainNode : Node2D
 	private Godot.Timer TaskTimer;
 	private Color[] pixels;
 	private Dictionary<int, PixelGroup> groups = new Dictionary<int, PixelGroup>();
+	private List<Vector2> lineCenters = new List<Vector2>();
 
 	public override void _Ready()
 	{
@@ -148,6 +149,7 @@ public partial class MainNode : Node2D
 			
 			// TODO: this is temp, to visualize the success of this. 
 			// TODO: getting weird curves with split screens
+			// TODO: maybe only use the largest group for speed
 			// If the pixel count for a color is under the threshold, leave it out
 			int count = 0;
 			int pixel_count_threshold = 100000;
@@ -171,11 +173,159 @@ public partial class MainNode : Node2D
 						newImg.SetPixel((int)p.X, (int)p.Y, Colors.White);
 					}
 					// This new image is still 1080 x 1920 pixels
-					newImg.SavePng($@"C:\Users\sethr\backup\Desktop\Companion\companion\temp_screenshot\frame_filter{count}.png");
+					//newImg.SavePng($@"C:\Users\sethr\backup\Desktop\Companion\companion\temp_screenshot\frame_filter{count}.png");
+					
+					// Take out any white pixels that are completely surrounded by white (top, bottom, right, left)
+					// Take out any white pixels that are completely surrounded by black (top, bottom, right, left)
+					// TODO: use dictionary instead of new image?
+					Image edgeImg = Image.Create(w, h, false, Image.Format.Rgba8);
+					edgeImg.Fill(Colors.Black);
+
+					for (int y2 = 1; y2 < h - 1; y2++)
+					{
+						for (int x2 = 1; x2 < w - 1; x2++)
+						{
+							if (newImg.GetPixel(x2, y2) == Colors.White)
+							{
+								bool up    = newImg.GetPixel(x2, y2 - 1) == Colors.White;
+								bool down  = newImg.GetPixel(x2, y2 + 1) == Colors.White;
+								bool left  = newImg.GetPixel(x2 - 1, y2) == Colors.White;
+								bool right = newImg.GetPixel(x2 + 1, y2) == Colors.White;
+
+								int whiteNeighbors = (up ? 1 : 0) + (down ? 1 : 0) + (left ? 1 : 0) + (right ? 1 : 0);
+
+								// Keep only edge pixels:
+								// - NOT fully surrounded by white (removes interior)
+								// - NOT isolated (removes noise)
+								// - DONT have a horizontal neighboor
+								if (whiteNeighbors > 0 && whiteNeighbors < 4 && (left || right))
+								{
+									edgeImg.SetPixel(x2, y2, Colors.White);
+								}
+							}
+						}
+					}
+					
+					// Make new image and save	
+					//edgeImg.SavePng($@"C:\Users\sethr\backup\Desktop\Companion\companion\temp_screenshot\frame_edges{count}.png");
+					
+					Image filteredImg = Image.Create(w, h, false, Image.Format.Rgba8);
+					filteredImg.Fill(Colors.Black);
+
+					for (int y2 = 1; y2 < h - 1; y2++)
+					{
+						for (int x2 = 1; x2 < w - 1; x2++)
+						{
+							if (edgeImg.GetPixel(x2, y2) == Colors.White)
+							{
+								bool up    = edgeImg.GetPixel(x2, y2 - 1) == Colors.White;
+								bool down  = edgeImg.GetPixel(x2, y2 + 1) == Colors.White;
+								bool left  = edgeImg.GetPixel(x2 - 1, y2) == Colors.White;
+								bool right = edgeImg.GetPixel(x2 + 1, y2) == Colors.White;
+
+								// keep only horizontal edges that have black on top and bottom, and white on left or right
+								if ((left || right) && (!up && !down))
+								{
+									filteredImg.SetPixel(x2, y2, Colors.White);
+								}
+							}
+						}
+					}
+
+					// Now we have all the one-pixel width horizontal edges.	
+					//filteredImg.SavePng($@"C:\Users\sethr\backup\Desktop\Companion\companion\temp_screenshot\frame_edges_filtered{count}.png");
+						
+						
+					// Now remove any horizontal edges that are less than 200 pixels long
+					bool[,] visited = new bool[w, h];
+
+					for (int y2 = 0; y2 < h; y2++)
+					{
+						for (int x2 = 0; x2 < w; x2++)
+						{
+							if (filteredImg.GetPixel(x2, y2) != Colors.White || visited[x2, y2])
+								continue;
+
+							Queue<Vector2> q = new Queue<Vector2>();
+							List<Vector2> segment = new List<Vector2>();
+
+							q.Enqueue(new Vector2(x2, y2));
+							visited[x2, y2] = true;
+
+							while (q.Count > 0)
+							{
+								var p = q.Dequeue();
+								segment.Add(p);
+
+								int px = (int)p.X;
+								int py = (int)p.Y;
+
+								// horizontal-only connectivity
+								int[,] dirs = { { -1, 0 }, { 1, 0 } };
+
+								for (int i = 0; i < 2; i++)
+								{
+									int nx = px + dirs[i, 0];
+									int ny = py + dirs[i, 1];
+
+									if (nx < 0 || ny < 0 || nx >= w || ny >= h)
+										continue;
+
+									if (visited[nx, ny])
+										continue;
+
+									if (filteredImg.GetPixel(nx, ny) == Colors.White)
+									{
+										visited[nx, ny] = true;
+										q.Enqueue(new Vector2(nx, ny));
+									}
+								}
+							}
+
+							// delete short segments
+							if (segment.Count >= 200)
+							{
+								// pick midpoint of the segment
+								Vector2 sum = Vector2.Zero;
+
+								foreach (var p in segment)
+									sum += p;
+
+								Vector2 center = sum / segment.Count;
+
+								//GD.Print("Line center: " + center);
+								lineCenters.Add(center);
+							}
+							else
+							{
+								foreach (var p in segment)
+									filteredImg.SetPixel((int)p.X, (int)p.Y, Colors.Black);
+							}
+						}
+					}
+					// Add small red dot in the center of each line, this is the reference loafpoint
+					foreach (var c in lineCenters)
+					{
+						int x = (int)c.X;
+						int y = (int)c.Y;
+
+						if (x >= 0 && x < w && y >= 0 && y < h)
+						{
+							filteredImg.SetPixel(x, y, Colors.Red);
+						}
+					}
+					filteredImg.SavePng($@"C:\Users\sethr\backup\Desktop\Companion\companion\temp_screenshot\frame_edges_filtered_final{count}.png");
+					
+					// TODO: need to know the location(s) of line(s)
 					
 					count++;
 				}
 			}
 			GD.Print($"Total # groups over {pixel_count_threshold} pixels: " + groups.Count); 
+			
+			for (int i = 0; i < lineCenters.Count; i++)
+			{
+				GD.Print("line center #" + i + ": " + lineCenters[i]);
+			}
 	}
 }
