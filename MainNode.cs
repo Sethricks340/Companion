@@ -27,6 +27,8 @@ public partial class MainNode : Node2D
 	private Godot.Timer TaskTimer;
 	private Color[] pixels;
 	private Dictionary<int, PixelGroup> groups = new Dictionary<int, PixelGroup>();
+	private Vector2? loafTarget = null;
+	private Thread loafThread;
 
 	public override void _Ready()
 	{
@@ -55,8 +57,8 @@ public partial class MainNode : Node2D
 		pixels = new Color[img.GetWidth() * img.GetHeight()];
 		
 		// Save Screen is in a new thread so it doesn't interrupt the animations
-		Thread thread = new Thread(new ThreadStart(SaveScreen));
-		thread.Start();
+		//Thread thread = new Thread(new ThreadStart(GetLoafTarget));
+		//thread.Start();
 	}
 
 	public override void _Input(InputEvent @event)
@@ -89,6 +91,15 @@ public partial class MainNode : Node2D
 			mousePos = DisplayServer.MouseGetPosition();
 			window_inst.Call("MoveWindowTo", mousePos + offset);
 		}
+		if (loafThread == null || !loafThread.IsAlive)
+		{
+			loafThread = new Thread(GetLoafTarget);
+			loafThread.Start();
+		}
+		if (loafTarget != null)
+		{
+			window_inst.Call("MoveWindowTo", (Vector2)loafTarget);
+		}
 		// +(-1,0) -> left // +(1,0) -> right // +(0,1) -> down // +(0,-1) -> up
 		//window_inst.Call("MoveWindowTo", (Vector2)window_inst.Call("get_window_position") + new Vector2(-1,0)); 
 	}	
@@ -108,7 +119,7 @@ public partial class MainNode : Node2D
 	{
 		window_inst.Call("MoveWindowTo", position);
 	}
-	private void SaveScreen()
+	private void GetLoafTarget()
 	{
 		System.Threading.Thread.Sleep(500); //wait till cat is loaded
 
@@ -136,7 +147,7 @@ public partial class MainNode : Node2D
 			
 			// Can't be called in this thread for some reason
 			int random = rng.RandiRange(0, lineCenters.Count - 1);
-			GD.Print("random: " + random);
+			//GD.Print("random: " + random);
 			Vector2 window_offset = new Vector2(-63, -115);
 			Vector2 randomLine = lineCenters[random];
 			float catW = 150;
@@ -152,11 +163,15 @@ public partial class MainNode : Node2D
 				random = rng.RandiRange(0, lineCenters.Count - 1);
 				randomLine = lineCenters[random];
 			}
-			GD.Print("Random Line: " + randomLine);
-			CallDeferred(nameof(MoveWindowSafe), randomLine + window_offset);
+			//GD.Print("Random Line: " + randomLine);
+			Vector2 goalpoint = randomLine + window_offset;
+			//CallDeferred(nameof(MoveWindowSafe), goalpoint);
+			loafTarget = goalpoint;
+			loafThread = null;
 	}
 	
 	private List<Vector2> FindHorizontalLineCenters(int w, int h, Image img){
+		groups.Clear();
 		List<Vector2> lineCenters = new List<Vector2>();
 		
 			for (int y = 1; y < h; y++){
@@ -230,7 +245,7 @@ public partial class MainNode : Node2D
 						newImg.SetPixel((int)p.X, (int)p.Y, Colors.White);
 					}
 					// This new image is still 1080 x 1920 pixels
-					newImg.SavePng($@"C:\Users\sethr\backup\Desktop\Companion\companion\temp_screenshot\frame_filter{count}.png");
+					//newImg.SavePng($@"C:\Users\sethr\backup\Desktop\Companion\companion\temp_screenshot\frame_filter{count}.png");
 					
 					// Take out any white pixels that are completely surrounded by white (top, bottom, right, left)
 					// Take out any white pixels that are completely surrounded by black (top, bottom, right, left)
@@ -264,7 +279,7 @@ public partial class MainNode : Node2D
 					}
 					
 					// Make new image and save	
-					edgeImg.SavePng($@"C:\Users\sethr\backup\Desktop\Companion\companion\temp_screenshot\frame_edges{count}.png");
+					//edgeImg.SavePng($@"C:\Users\sethr\backup\Desktop\Companion\companion\temp_screenshot\frame_edges{count}.png");
 					
 					Image filteredImg = Image.Create(w, h, false, Image.Format.Rgba8);
 					filteredImg.Fill(Colors.Black);
@@ -290,7 +305,7 @@ public partial class MainNode : Node2D
 					}
 
 					// Now we have all the one-pixel width horizontal edges.	
-					filteredImg.SavePng($@"C:\Users\sethr\backup\Desktop\Companion\companion\temp_screenshot\frame_edges_filtered{count}.png");
+					//filteredImg.SavePng($@"C:\Users\sethr\backup\Desktop\Companion\companion\temp_screenshot\frame_edges_filtered{count}.png");
 						
 						
 					// Now remove any horizontal edges that are less than 200 pixels long
