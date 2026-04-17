@@ -47,7 +47,8 @@ public partial class MainNode : Node2D
 		rng.Randomize();
 		TaskTimer = GetNode<Godot.Timer>("TaskTimer");
 		TaskTimer.Timeout += OnTaskTimerTimeout;
-		cat_animated_sprite.Animation = "walking";
+		//cat_animated_sprite.Animation = "walking";
+		cat_animated_sprite.Animation = "loafing";
 		cat_animated_sprite.Play();
 		
 		var img = DisplayServer.ScreenGetImage(0);
@@ -89,7 +90,7 @@ public partial class MainNode : Node2D
 			window_inst.Call("MoveWindowTo", mousePos + offset);
 		}
 		// +(-1,0) -> left // +(1,0) -> right // +(0,1) -> down // +(0,-1) -> up
-		window_inst.Call("MoveWindowTo", (Vector2)window_inst.Call("get_window_position") + new Vector2(-1,0)); 
+		//window_inst.Call("MoveWindowTo", (Vector2)window_inst.Call("get_window_position") + new Vector2(-1,0)); 
 	}	
 	
 	private void OnTaskTimerTimeout()
@@ -102,6 +103,10 @@ public partial class MainNode : Node2D
 		//cat_animated_sprite.Animation = "walking";
 		//cat_animated_sprite.Animation = animation_list[rng.RandiRange(0, animation_list.Count - 1)];
 		//cat_animated_sprite.Play();
+	}
+	private void MoveWindowSafe(Vector2 position)
+	{
+		window_inst.Call("MoveWindowTo", position);
 	}
 	private void SaveScreen()
 	{
@@ -121,13 +126,34 @@ public partial class MainNode : Node2D
 			
 			// Get image width and height (screenshot of whole screen, NOT just godot window)
 			//GD.Print("Image Height x Width: " + img.GetHeight() + " x " + img.GetWidth()); // My Output: Image Height x Width: 1080 x 1920
-			int w = img.GetWidth();1
+			int w = img.GetWidth();
 			int h = img.GetHeight();
 			List<Vector2> lineCenters = FindHorizontalLineCenters(w, h, img);
 			// Print line centers debug
-			for (int i = 0; i < lineCenters.Count; i++){
-				GD.Print("line center #" + i + ": " + lineCenters[i]);
+			//for (int i = 0; i < lineCenters.Count; i++){
+				//GD.Print("line center #" + i + ": " + lineCenters[i]);
+			//}
+			
+			// Can't be called in this thread for some reason
+			int random = rng.RandiRange(0, lineCenters.Count - 1);
+			GD.Print("random: " + random);
+			Vector2 window_offset = new Vector2(-63, -115);
+			Vector2 randomLine = lineCenters[random];
+			float catW = 150;
+			float catH = 135;
+
+			while (
+				randomLine.X < catW / 2 ||
+				randomLine.Y < catH / 2 ||
+				randomLine.X > w - catW / 2 ||
+				randomLine.Y > h - catH / 2
+			)
+			{
+				random = rng.RandiRange(0, lineCenters.Count - 1);
+				randomLine = lineCenters[random];
 			}
+			GD.Print("Random Line: " + randomLine);
+			CallDeferred(nameof(MoveWindowSafe), randomLine + window_offset);
 	}
 	
 	private List<Vector2> FindHorizontalLineCenters(int w, int h, Image img){
@@ -204,7 +230,7 @@ public partial class MainNode : Node2D
 						newImg.SetPixel((int)p.X, (int)p.Y, Colors.White);
 					}
 					// This new image is still 1080 x 1920 pixels
-					//newImg.SavePng($@"C:\Users\sethr\backup\Desktop\Companion\companion\temp_screenshot\frame_filter{count}.png");
+					newImg.SavePng($@"C:\Users\sethr\backup\Desktop\Companion\companion\temp_screenshot\frame_filter{count}.png");
 					
 					// Take out any white pixels that are completely surrounded by white (top, bottom, right, left)
 					// Take out any white pixels that are completely surrounded by black (top, bottom, right, left)
@@ -238,7 +264,7 @@ public partial class MainNode : Node2D
 					}
 					
 					// Make new image and save	
-					//edgeImg.SavePng($@"C:\Users\sethr\backup\Desktop\Companion\companion\temp_screenshot\frame_edges{count}.png");
+					edgeImg.SavePng($@"C:\Users\sethr\backup\Desktop\Companion\companion\temp_screenshot\frame_edges{count}.png");
 					
 					Image filteredImg = Image.Create(w, h, false, Image.Format.Rgba8);
 					filteredImg.Fill(Colors.Black);
@@ -264,7 +290,7 @@ public partial class MainNode : Node2D
 					}
 
 					// Now we have all the one-pixel width horizontal edges.	
-					//filteredImg.SavePng($@"C:\Users\sethr\backup\Desktop\Companion\companion\temp_screenshot\frame_edges_filtered{count}.png");
+					filteredImg.SavePng($@"C:\Users\sethr\backup\Desktop\Companion\companion\temp_screenshot\frame_edges_filtered{count}.png");
 						
 						
 					// Now remove any horizontal edges that are less than 200 pixels long
@@ -350,15 +376,6 @@ public partial class MainNode : Node2D
 					count++;
 				}
 			}
-			//GD.Print($"Total # groups over {pixel_count_threshold} pixels: " + groups.Count); 
-			
-			//// Print line centers debug
-			//for (int i = 0; i < lineCenters.Count; i++){
-				//GD.Print("line center #" + i + ": " + lineCenters[i]);
-			//}
-			
-			// TODO: use the loafpoints to move the cat to one of these random points and loaf on it
-
 
 			return lineCenters;
 	}

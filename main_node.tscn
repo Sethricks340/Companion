@@ -146,9 +146,7 @@ script = ExtResource("1_3sjkb")
 [node name="cat" type="AnimatedSprite2D" parent="."]
 position = Vector2(72, 70)
 sprite_frames = SubResource("SpriteFrames_bdgja")
-animation = &"walking"
-frame = 8
-frame_progress = 0.716684
+animation = &"loafing"
 
 [node name="TaskTimer" type="Timer" parent="."]
 autostart = true
