@@ -206,31 +206,29 @@ public partial class MainNode : Node2D
 				//GD.Print("line center #" + i + ": " + lineCenters[i]);
 			//}
 			
-			// Can't be called in this thread for some reason
-			int random = rng.RandiRange(0, lineCenters.Count - 1);
-			//GD.Print("random: " + random);
 			Vector2 window_offset = new Vector2(-63, -115);
-			Vector2 randomLine = lineCenters[random];
+			List<Vector2> validLines = new List<Vector2>();
+
+			// Filter valid lines so that the cat doesn't try to go out of bounds
+			foreach (var p in lineCenters)
+			{
+				var g = p + window_offset;
+
+				if (g.X >= 0 && g.Y >= 0 && g.X < w && g.Y < h)
+					validLines.Add(p);
+			}
+
+			int random = rng.RandiRange(0, validLines.Count - 1);
+			Vector2 randomLine = validLines[random];
+			
 			float catW = 150;
 			float catH = 135;
 
-			while (
-				randomLine.X < catW / 2 ||
-				randomLine.Y < catH / 2 ||
-				randomLine.X > w - catW / 2 ||
-				randomLine.Y > h - catH / 2
-			)
-			{
-				random = rng.RandiRange(0, lineCenters.Count - 1);
-				randomLine = lineCenters[random];
-			}
-			//GD.Print("Random Line: " + randomLine);
 			Vector2 goalpoint = randomLine + window_offset;
-			//CallDeferred(nameof(MoveWindowSafe), goalpoint);
+			GD.Print(goalpoint);
 			loafTarget = goalpoint;
 			CallDeferred(nameof(WalkToLine));
-			
-			
+
 			loafThread = null;
 	}
 	
