@@ -151,3 +151,5 @@ animation = &"loafing"
 [node name="TaskTimer" type="Timer" parent="."]
 wait_time = 20.0
 autostart = true
+
+[node name="SeekTimer" type="Timer" parent="."]

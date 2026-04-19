@@ -25,11 +25,14 @@ public partial class MainNode : Node2D
 	private RandomNumberGenerator rng = new RandomNumberGenerator();
 	private List<string> animation_list = new List<string>(){"standing","walking","loafing"};
 	private Godot.Timer TaskTimer;
+	private Godot.Timer SeekTimer;
 	private Color[] pixels;
 	private Dictionary<int, PixelGroup> groups = new Dictionary<int, PixelGroup>();
 	private Vector2? loafTarget = null;
 	private Thread loafThread;
 	private bool seekWalking = false;
+	private float stuckTime = 0f;
+	private Vector2 lastPos;
 
 	public override void _Ready()
 	{
@@ -50,12 +53,17 @@ public partial class MainNode : Node2D
 		rng.Randomize();
 		TaskTimer = GetNode<Godot.Timer>("TaskTimer");
 		TaskTimer.Timeout += OnTaskTimerTimeout;
+		SeekTimer = GetNode<Godot.Timer>("SeekTimer");
+		SeekTimer.Timeout += OnSeekTimeout;
 		//cat_animated_sprite.Animation = "walking";
 		cat_animated_sprite.Animation = "loafing";
 		cat_animated_sprite.Play();
 		
 		var img = DisplayServer.ScreenGetImage(0);
 		pixels = new Color[img.GetWidth() * img.GetHeight()];
+		
+		lastPos = (Vector2)window_inst.Call("get_window_position");
+		stuckTime = 0f;
 		
 		OnTaskTimerTimeout();
 		
@@ -95,22 +103,46 @@ public partial class MainNode : Node2D
 			window_inst.Call("MoveWindowTo", mousePos + offset);
 		}
 		if (seekWalking){
-					
 			Vector2 current = (Vector2)window_inst.Call("get_window_position");
+			
+			Vector2 direction = ((Vector2)loafTarget) - current;
+			
+			if (current.DistanceTo(lastPos) < 0.5f)
+			{
+				stuckTime += (float)delta;
+			}
+			else
+			{
+				stuckTime = 0f;
+				lastPos = current;
+			}
+			
+			if (stuckTime > 2.5f) 
+			{
+				GD.Print("stuck -> aborting");
+				SeekTimer.Stop();
+				seekWalking = false;
+				cat_animated_sprite.Animation = "loafing";
+				cat_animated_sprite.Play();
+			}
+
+			if (direction.X < 0)
+				cat_animated_sprite.FlipH = false;   // moving left
+			else
+				cat_animated_sprite.FlipH = true;   // moving right
 			 
 			if (loafTarget != null)
 			{
 				Vector2 dir = (((Vector2)loafTarget) - current).Normalized();
-				float speed = 1f; // pixels per frame 
-				//GD.Print(dir);
-				
+				float speed = 1.5f; // pixels per frame 
 				window_inst.Call("MoveWindowTo", current + dir * speed);
 			}
 			
 			GD.Print("current: " + current);
 			GD.Print("target: " + (Vector2)loafTarget);
 			
-			if (current == (Vector2)loafTarget){
+			if (current.DistanceTo((Vector2)loafTarget) < 1f){
+				SeekTimer.Stop();
 				seekWalking = false;	
 				cat_animated_sprite.Animation = "loafing";
 				cat_animated_sprite.Play();
@@ -125,29 +157,16 @@ public partial class MainNode : Node2D
 		GD.Print("timer");
 		if (!seekWalking) StartLoafThread();
 	}
+	private void OnSeekTimeout()
+	{
+		seekWalking = false;	
+		cat_animated_sprite.Animation = "loafing";
+		cat_animated_sprite.Play();
+	}
 	private void WalkToLine(){
 		seekWalking = true;
-		// TODO: replace this with walking over to the line and loafing
-		//window_inst.Call("MoveWindowTo", (Vector2)loafTarget);
-		
 		cat_animated_sprite.Animation = "walking";
-		
-		//window_inst.Call("MoveWindowTo", (Vector2)window_inst.Call("get_window_position") + new Vector2(-1,0));
-		
-		//
-		//
-		//Vector2 current = (Vector2)window_inst.Call("get_window_position");
-		 //
-		//if (loafTarget != null)
-		//{
-			//Vector2 dir = (((Vector2)loafTarget) - current).Normalized();
-			//float speed = 1f; // pixels per frame 
-			//GD.Print(dir);
-			//
-			//window_inst.Call("MoveWindowTo", current + dir * speed);
-		//}
-		//
-		//seekWalking = false;
+		SeekTimer.Start(20.0);
 	}
 	private void StartLoafThread(){
 		if (((loafThread == null || !loafThread.IsAlive)) && !seekWalking)
