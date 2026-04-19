@@ -29,6 +29,7 @@ public partial class MainNode : Node2D
 	private Dictionary<int, PixelGroup> groups = new Dictionary<int, PixelGroup>();
 	private Vector2? loafTarget = null;
 	private Thread loafThread;
+	private bool seekWalking = false;
 
 	public override void _Ready()
 	{
@@ -55,6 +56,8 @@ public partial class MainNode : Node2D
 		
 		var img = DisplayServer.ScreenGetImage(0);
 		pixels = new Color[img.GetWidth() * img.GetHeight()];
+		
+		OnTaskTimerTimeout();
 		
 		// Save Screen is in a new thread so it doesn't interrupt the animations
 		//Thread thread = new Thread(new ThreadStart(GetLoafTarget));
@@ -91,14 +94,27 @@ public partial class MainNode : Node2D
 			mousePos = DisplayServer.MouseGetPosition();
 			window_inst.Call("MoveWindowTo", mousePos + offset);
 		}
-		if (loafThread == null || !loafThread.IsAlive)
-		{
-			loafThread = new Thread(GetLoafTarget);
-			loafThread.Start();
-		}
-		if (loafTarget != null)
-		{
-			window_inst.Call("MoveWindowTo", (Vector2)loafTarget);
+		if (seekWalking){
+					
+			Vector2 current = (Vector2)window_inst.Call("get_window_position");
+			 
+			if (loafTarget != null)
+			{
+				Vector2 dir = (((Vector2)loafTarget) - current).Normalized();
+				float speed = 1f; // pixels per frame 
+				//GD.Print(dir);
+				
+				window_inst.Call("MoveWindowTo", current + dir * speed);
+			}
+			
+			GD.Print("current: " + current);
+			GD.Print("target: " + (Vector2)loafTarget);
+			
+			if (current == (Vector2)loafTarget){
+				seekWalking = false;	
+				cat_animated_sprite.Animation = "loafing";
+				cat_animated_sprite.Play();
+			}
 		}
 		// +(-1,0) -> left // +(1,0) -> right // +(0,1) -> down // +(0,-1) -> up
 		//window_inst.Call("MoveWindowTo", (Vector2)window_inst.Call("get_window_position") + new Vector2(-1,0)); 
@@ -106,22 +122,48 @@ public partial class MainNode : Node2D
 	
 	private void OnTaskTimerTimeout()
 	{
-		AnimationLogic();
+		GD.Print("timer");
+		if (!seekWalking) StartLoafThread();
 	}
-	public void AnimationLogic(){
-		// TODO: right now it is just set to walking, will need to change animations
-		//cat_animated_sprite.Animation = "standing";
-		//cat_animated_sprite.Animation = "walking";
-		//cat_animated_sprite.Animation = animation_list[rng.RandiRange(0, animation_list.Count - 1)];
-		//cat_animated_sprite.Play();
+	private void WalkToLine(){
+		seekWalking = true;
+		// TODO: replace this with walking over to the line and loafing
+		//window_inst.Call("MoveWindowTo", (Vector2)loafTarget);
+		
+		cat_animated_sprite.Animation = "walking";
+		
+		//window_inst.Call("MoveWindowTo", (Vector2)window_inst.Call("get_window_position") + new Vector2(-1,0));
+		
+		//
+		//
+		//Vector2 current = (Vector2)window_inst.Call("get_window_position");
+		 //
+		//if (loafTarget != null)
+		//{
+			//Vector2 dir = (((Vector2)loafTarget) - current).Normalized();
+			//float speed = 1f; // pixels per frame 
+			//GD.Print(dir);
+			//
+			//window_inst.Call("MoveWindowTo", current + dir * speed);
+		//}
+		//
+		//seekWalking = false;
 	}
+	private void StartLoafThread(){
+		if (((loafThread == null || !loafThread.IsAlive)) && !seekWalking)
+		{
+			loafThread = new Thread(GetLoafTarget);
+			loafThread.Start();
+		}
+	}
+
 	private void MoveWindowSafe(Vector2 position)
 	{
 		window_inst.Call("MoveWindowTo", position);
 	}
 	private void GetLoafTarget()
 	{
-		System.Threading.Thread.Sleep(500); //wait till cat is loaded
+		//System.Threading.Thread.Sleep(500); //wait till cat is loaded
 
 			// Make sure there is a screen
 			if (DisplayServer.GetScreenCount() <= 0)
@@ -167,6 +209,9 @@ public partial class MainNode : Node2D
 			Vector2 goalpoint = randomLine + window_offset;
 			//CallDeferred(nameof(MoveWindowSafe), goalpoint);
 			loafTarget = goalpoint;
+			CallDeferred(nameof(WalkToLine));
+			
+			
 			loafThread = null;
 	}
 	
