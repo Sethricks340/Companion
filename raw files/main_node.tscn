@@ -1,0 +1,155 @@
+[gd_scene load_steps=33 format=3 uid="uid://dg641dwgtoda7"]
+
+[ext_resource type="Script" path="res://MainNode.cs" id="1_3sjkb"]
+[ext_resource type="Texture2D" uid="uid://dyqm7fuwkmo14" path="res://cats/cat_loaf.png" id="2_6e0pd"]
+[ext_resource type="Texture2D" uid="uid://6ohr4rfd436j" path="res://cats/cat_straight.png" id="2_afu2b"]
+[ext_resource type="Texture2D" uid="uid://bk14o20s1ng11" path="res://cats/walking_animation/Cat Animation (1).png" id="4_shney"]
+[ext_resource type="Texture2D" uid="uid://c065qxhfvsrgk" path="res://cats/walking_animation/Cat Animation (2).png" id="5_qqeiw"]
+[ext_resource type="Texture2D" uid="uid://kifb7ngjt21h" path="res://cats/walking_animation/Cat Animation (3).png" id="6_iixew"]
+[ext_resource type="Texture2D" uid="uid://dchx2ltf4yyb6" path="res://cats/walking_animation/Cat Animation (4).png" id="7_mtuys"]
+[ext_resource type="Texture2D" uid="uid://cc4rlrsbqd0ks" path="res://cats/walking_animation/Cat Animation (5).png" id="8_yie5c"]
+[ext_resource type="Texture2D" uid="uid://cqp0mxc4pylyf" path="res://cats/walking_animation/Cat Animation (6).png" id="9_3gyi6"]
+[ext_resource type="Texture2D" uid="uid://2odgnqgg27ms" path="res://cats/walking_animation/Cat Animation (7).png" id="10_s07sa"]
+[ext_resource type="Texture2D" uid="uid://co43hliqowdld" path="res://cats/walking_animation/Cat Animation (8).png" id="11_cckgl"]
+[ext_resource type="Texture2D" uid="uid://bhwha00c8h65e" path="res://cats/walking_animation/Cat Animation (9).png" id="12_kcrnd"]
+[ext_resource type="Texture2D" uid="uid://b27c647c04egg" path="res://cats/walking_animation/Cat Animation (10).png" id="13_sb6ib"]
+[ext_resource type="Texture2D" uid="uid://dtu6ke7ago3ej" path="res://cats/walking_animation/Cat Animation (11).png" id="14_62yyc"]
+[ext_resource type="Texture2D" uid="uid://d1obg7ljrwou6" path="res://cats/walking_animation/Cat Animation (12).png" id="15_bw07c"]
+[ext_resource type="Texture2D" uid="uid://cgtvwgmkiu1kk" path="res://cats/walking_animation/Cat Animation (13).png" id="16_ieg8k"]
+[ext_resource type="Texture2D" uid="uid://cnril580hlqvc" path="res://cats/walking_animation/Cat Animation (14).png" id="17_uofcr"]
+[ext_resource type="Texture2D" uid="uid://b73qhdv468cxc" path="res://cats/walking_animation/Cat Animation (15).png" id="18_d8cby"]
+[ext_resource type="Texture2D" uid="uid://b0fxuuedaowha" path="res://cats/walking_animation/Cat Animation (16).png" id="19_rhxf2"]
+[ext_resource type="Texture2D" uid="uid://dbssrjboc80ey" path="res://cats/walking_animation/Cat Animation (17).png" id="20_6lqxp"]
+[ext_resource type="Texture2D" uid="uid://bgg4kt4pqr3l5" path="res://cats/walking_animation/Cat Animation (18).png" id="21_wx5y7"]
+[ext_resource type="Texture2D" uid="uid://co2nfsd3k4766" path="res://cats/walking_animation/Cat Animation (19).png" id="22_o5bbl"]
+[ext_resource type="Texture2D" uid="uid://cljkqe8r8xf8j" path="res://cats/walking_animation/Cat Animation (20).png" id="23_4hstv"]
+[ext_resource type="Texture2D" uid="uid://cymslttertf4e" path="res://cats/walking_animation/Cat Animation (21).png" id="24_ujlbw"]
+[ext_resource type="Texture2D" uid="uid://cq7mj0n4cq6to" path="res://cats/walking_animation/Cat Animation (22).png" id="25_tdv4c"]
+[ext_resource type="Texture2D" uid="uid://7h6m8jtnigbx" path="res://cats/walking_animation/Cat Animation (23).png" id="26_a1amf"]
+[ext_resource type="Texture2D" uid="uid://dkqwpo1gt4uxy" path="res://cats/walking_animation/Cat Animation (24).png" id="27_oet88"]
+[ext_resource type="Texture2D" uid="uid://vvj3a5hby3gp" path="res://cats/walking_animation/Cat Animation (25).png" id="28_jeyew"]
+[ext_resource type="Texture2D" uid="uid://pssas0i6fqxu" path="res://cats/walking_animation/Cat Animation (26).png" id="29_o2ykb"]
+[ext_resource type="Texture2D" uid="uid://q25hkm3h4m4r" path="res://cats/walking_animation/Cat Animation (27).png" id="30_jvcvo"]
+[ext_resource type="Texture2D" uid="uid://dv2efk6bnx0pu" path="res://cats/walking_animation/Cat Animation (28).png" id="31_ldm3y"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_bdgja"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_6e0pd")
+}],
+"loop": true,
+"name": &"loafing",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_afu2b")
+}],
+"loop": true,
+"name": &"standing",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("4_shney")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_qqeiw")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6_iixew")
+}, {
+"duration": 1.0,
+"texture": ExtResource("7_mtuys")
+}, {
+"duration": 1.0,
+"texture": ExtResource("8_yie5c")
+}, {
+"duration": 1.0,
+"texture": ExtResource("9_3gyi6")
+}, {
+"duration": 1.0,
+"texture": ExtResource("10_s07sa")
+}, {
+"duration": 1.0,
+"texture": ExtResource("11_cckgl")
+}, {
+"duration": 1.0,
+"texture": ExtResource("12_kcrnd")
+}, {
+"duration": 1.0,
+"texture": ExtResource("13_sb6ib")
+}, {
+"duration": 1.0,
+"texture": ExtResource("14_62yyc")
+}, {
+"duration": 1.0,
+"texture": ExtResource("15_bw07c")
+}, {
+"duration": 1.0,
+"texture": ExtResource("16_ieg8k")
+}, {
+"duration": 1.0,
+"texture": ExtResource("17_uofcr")
+}, {
+"duration": 1.0,
+"texture": ExtResource("18_d8cby")
+}, {
+"duration": 1.0,
+"texture": ExtResource("19_rhxf2")
+}, {
+"duration": 1.0,
+"texture": ExtResource("20_6lqxp")
+}, {
+"duration": 1.0,
+"texture": ExtResource("21_wx5y7")
+}, {
+"duration": 1.0,
+"texture": ExtResource("22_o5bbl")
+}, {
+"duration": 1.0,
+"texture": ExtResource("23_4hstv")
+}, {
+"duration": 1.0,
+"texture": ExtResource("24_ujlbw")
+}, {
+"duration": 1.0,
+"texture": ExtResource("25_tdv4c")
+}, {
+"duration": 1.0,
+"texture": ExtResource("26_a1amf")
+}, {
+"duration": 1.0,
+"texture": ExtResource("27_oet88")
+}, {
+"duration": 1.0,
+"texture": ExtResource("28_jeyew")
+}, {
+"duration": 1.0,
+"texture": ExtResource("29_o2ykb")
+}, {
+"duration": 1.0,
+"texture": ExtResource("30_jvcvo")
+}, {
+"duration": 1.0,
+"texture": ExtResource("31_ldm3y")
+}],
+"loop": true,
+"name": &"walking",
+"speed": 25.0
+}]
+
+[node name="MainNode" type="Node2D"]
+script = ExtResource("1_3sjkb")
+
+[node name="cat" type="AnimatedSprite2D" parent="."]
+position = Vector2(72, 70)
+sprite_frames = SubResource("SpriteFrames_bdgja")
+animation = &"loafing"
+
+[node name="TaskTimer" type="Timer" parent="."]
+wait_time = 20.0
+autostart = true
+
+[node name="SeekTimer" type="Timer" parent="."]
