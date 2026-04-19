@@ -144,7 +144,8 @@ animations = [{
 script = ExtResource("1_3sjkb")
 
 [node name="cat" type="AnimatedSprite2D" parent="."]
-position = Vector2(72, 70)
+position = Vector2(55, 56)
+scale = Vector2(0.75, 0.75)
 sprite_frames = SubResource("SpriteFrames_bdgja")
 animation = &"loafing"
 

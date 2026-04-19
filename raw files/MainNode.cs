@@ -36,6 +36,9 @@ public partial class MainNode : Node2D
 
 	public override void _Ready()
 	{
+		DisplayServer.WindowSetFlag(DisplayServer.WindowFlags.Transparent, true);
+		GetViewport().TransparentBg = true;
+		
 		var window_script = (GDScript)GD.Load("res://window.gd");
 		window_inst = (Node)window_script.New();
 		AddChild(window_inst);
@@ -206,7 +209,7 @@ public partial class MainNode : Node2D
 				//GD.Print("line center #" + i + ": " + lineCenters[i]);
 			//}
 			
-			Vector2 window_offset = new Vector2(-63, -115);
+			Vector2 window_offset = new Vector2(-48, -90);
 			List<Vector2> validLines = new List<Vector2>();
 
 			// Filter valid lines so that the cat doesn't try to go out of bounds
