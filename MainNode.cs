@@ -225,7 +225,6 @@ public partial class MainNode : Node2D
 			float catH = 135;
 
 			Vector2 goalpoint = randomLine + window_offset;
-			GD.Print(goalpoint);
 			loafTarget = goalpoint;
 			CallDeferred(nameof(WalkToLine));
 
