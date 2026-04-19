@@ -119,7 +119,7 @@ public partial class MainNode : Node2D
 			
 			if (stuckTime > 2.5f) 
 			{
-				GD.Print("stuck -> aborting");
+				//GD.Print("stuck -> aborting");
 				SeekTimer.Stop();
 				seekWalking = false;
 				cat_animated_sprite.Animation = "loafing";
@@ -138,8 +138,8 @@ public partial class MainNode : Node2D
 				window_inst.Call("MoveWindowTo", current + dir * speed);
 			}
 			
-			GD.Print("current: " + current);
-			GD.Print("target: " + (Vector2)loafTarget);
+			//GD.Print("current: " + current);
+			//GD.Print("target: " + (Vector2)loafTarget);
 			
 			if (current.DistanceTo((Vector2)loafTarget) < 1f){
 				SeekTimer.Stop();
@@ -154,7 +154,7 @@ public partial class MainNode : Node2D
 	
 	private void OnTaskTimerTimeout()
 	{
-		GD.Print("timer");
+		//GD.Print("timer");
 		if (!seekWalking) StartLoafThread();
 	}
 	private void OnSeekTimeout()
@@ -194,7 +194,7 @@ public partial class MainNode : Node2D
 				return;
 			
 			// Temp save original image
-			img.SavePng(@"C:\Users\sethr\backup\Desktop\Companion\companion\temp_screenshot\frame.png");
+			//img.SavePng(@"C:\Users\sethr\backup\Desktop\Companion\companion\temp_screenshot\frame.png");
 			
 			// Get image width and height (screenshot of whole screen, NOT just godot window)
 			//GD.Print("Image Height x Width: " + img.GetHeight() + " x " + img.GetWidth()); // My Output: Image Height x Width: 1080 x 1920
@@ -450,7 +450,7 @@ public partial class MainNode : Node2D
 							filteredImg.SetPixel(x, y, Colors.Red);
 						}
 					}
-					filteredImg.SavePng($@"C:\Users\sethr\backup\Desktop\Companion\companion\temp_screenshot\frame_edges_filtered_final{count}.png");
+					//filteredImg.SavePng($@"C:\Users\sethr\backup\Desktop\Companion\companion\temp_screenshot\frame_edges_filtered_final{count}.png");
 					
 					count++;
 				}
