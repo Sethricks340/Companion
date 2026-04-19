@@ -38,6 +38,10 @@ public partial class MainNode : Node2D
 	{
 		DisplayServer.WindowSetFlag(DisplayServer.WindowFlags.Transparent, true);
 		GetViewport().TransparentBg = true;
+		RenderingServer.SetDefaultClearColor(new Color(0, 0, 0, 0));
+		//GD.Print(DisplayServer.WindowGetFlag(DisplayServer.WindowFlags.Transparent));
+		//GD.Print(GetViewport().TransparentBg);
+		//GD.Print(RenderingServer.GetDefaultClearColor());
 		
 		var window_script = (GDScript)GD.Load("res://window.gd");
 		window_inst = (Node)window_script.New();
