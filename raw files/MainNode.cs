@@ -36,10 +36,11 @@ public partial class MainNode : Node2D
 
 	public override void _Ready()
 	{
+		DisplayServer.WindowSetFlag(DisplayServer.WindowFlags.Borderless, true);
 		DisplayServer.WindowSetFlag(DisplayServer.WindowFlags.Transparent, true);
 		GetViewport().TransparentBg = true;
 		RenderingServer.SetDefaultClearColor(new Color(0, 0, 0, 0));
-		//GD.Print(DisplayServer.WindowGetFlag(DisplayServer.WindowFlags.Transparent));
+		//GD.Print(DisplayServer.WindowGetFlag(DisplayServer.WindowFlags.Borderless));
 		//GD.Print(GetViewport().TransparentBg);
 		//GD.Print(RenderingServer.GetDefaultClearColor());
 		
