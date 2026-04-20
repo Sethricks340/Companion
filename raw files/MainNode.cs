@@ -224,12 +224,18 @@ public partial class MainNode : Node2D
 				if (g.X >= 0 && g.Y >= 0 && g.X < w && g.Y < h)
 					validLines.Add(p);
 			}
+			
+			if (validLines.Count == 0)
+			{
+				loafThread = null;
+				return;
+			}
 
 			int random = rng.RandiRange(0, validLines.Count - 1);
 			Vector2 randomLine = validLines[random];
 			
-			float catW = 150;
-			float catH = 135;
+			//float catW = 150;
+			//float catH = 135;
 
 			Vector2 goalpoint = randomLine + window_offset;
 			loafTarget = goalpoint;
@@ -265,27 +271,30 @@ public partial class MainNode : Node2D
 			}
 			
 			// Remove all but the largest color in dictionary
-			int largestKey = -1;
-			int largestCount = 0;
-
-			foreach (var kv in groups){
-				if (kv.Value.Count > largestCount)
-				{
-					largestCount = kv.Value.Count;
-					largestKey = kv.Key;
-				}
-			}
-
-			var keysToRemove = new List<int>();
-
-			foreach (var kv in groups){
-				if (kv.Key != largestKey)
-					keysToRemove.Add(kv.Key);
-			}
-
-			foreach (var k in keysToRemove){
-				groups.Remove(k);
-			}
+			//int largestKey = -1;
+			//int largestCount = 0;
+//
+			//foreach (var kv in groups){
+				//if (kv.Value.Count > largestCount)
+				//{
+					//largestCount = kv.Value.Count;
+					//largestKey = kv.Key;
+				//}
+			//}
+//
+			//var keysToRemove = new List<int>();
+//
+			//foreach (var kv in groups){
+				//if (kv.Key != largestKey)
+					//keysToRemove.Add(kv.Key);
+			//}
+//
+			//foreach (var k in keysToRemove){
+				//groups.Remove(k);
+			//}
+			
+			var sortedGroups = new List<KeyValuePair<int, PixelGroup>>(groups);
+			sortedGroups.Sort((a, b) => b.Value.Count.CompareTo(a.Value.Count)); // largest first
 			
 			// TODO: this is temp, to visualize the success of this. 
 			// TODO: getting weird curves with split screens
@@ -293,22 +302,24 @@ public partial class MainNode : Node2D
 			// If the pixel count for a color is under the threshold, leave it out
 			int count = 0;
 			int pixel_count_threshold = 100000;
-			foreach (var kv in groups){
+			foreach (var kv in sortedGroups){
 				if (kv.Value.Count < pixel_count_threshold){
-					groups.Remove(kv.Key);
+					continue;
+					//sortedGroups.Remove(kv.Key);
 					// return // What if there are none over 100,000
 				}
 				else{
 					//GD.Print("Index: " + count + " Key: " + kv.Key + " Count: " + kv.Value.Count);
 					
 			 		//We are reconstructing a new image for each significant color, white on a black background
-					int targetKey = new List<int>(groups.Keys)[count];
+					//int targetKey = new List<int>(sortedGroups.Keys)[count];
 					
 					Image newImg = Image.Create(w, h, false, Image.Format.Rgba8);
 					newImg.Fill(Colors.Black);
 
 					// Reconstruct a rough image from this color
-					foreach (var p in groups[targetKey].Positions)
+					//foreach (var p in sortedGroups[targetKey].Positions)
+					foreach (var p in kv.Value.Positions)
 					{
 						newImg.SetPixel((int)p.X, (int)p.Y, Colors.White);
 					}
