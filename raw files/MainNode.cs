@@ -202,7 +202,7 @@ public partial class MainNode : Node2D
 				return;
 			
 			// Temp save original image
-			img.SavePng(@"C:\Users\sethr\backup\Desktop\Companion\raw files\temp_screenshot\frame.png");
+			//img.SavePng(@"C:\Users\sethr\backup\Desktop\Companion\raw files\temp_screenshot\frame.png");
 			
 			// Get image width and height (screenshot of whole screen, NOT just godot window)
 			//GD.Print("Image Height x Width: " + img.GetHeight() + " x " + img.GetWidth()); // My Output: Image Height x Width: 1080 x 1920
@@ -326,7 +326,7 @@ public partial class MainNode : Node2D
 						newImg.SetPixel((int)p.X, (int)p.Y, Colors.White);
 					}
 					// This new image is still 1080 x 1920 pixels
-					newImg.SavePng($@"C:\Users\sethr\backup\Desktop\Companion\raw files\temp_screenshot\frame_filter{count}.png");
+					//newImg.SavePng($@"C:\Users\sethr\backup\Desktop\Companion\raw files\temp_screenshot\frame_filter{count}.png");
 					
 					// Take out any white pixels that are completely surrounded by white (top, bottom, right, left)
 					// Take out any white pixels that are completely surrounded by black (top, bottom, right, left)
@@ -360,7 +360,7 @@ public partial class MainNode : Node2D
 					}
 					
 					// Make new image and save	
-					edgeImg.SavePng($@"C:\Users\sethr\backup\Desktop\Companion\raw files\temp_screenshot\frame_edges{count}.png");
+					//edgeImg.SavePng($@"C:\Users\sethr\backup\Desktop\Companion\raw files\temp_screenshot\frame_edges{count}.png");
 					
 					Image filteredImg = Image.Create(w, h, false, Image.Format.Rgba8);
 					filteredImg.Fill(Colors.Black);
@@ -386,7 +386,7 @@ public partial class MainNode : Node2D
 					}
 
 					// Now we have all the one-pixel width horizontal edges.	
-					filteredImg.SavePng($@"C:\Users\sethr\backup\Desktop\Companion\raw files\temp_screenshot\frame_edges_filtered{count}.png");
+					//filteredImg.SavePng($@"C:\Users\sethr\backup\Desktop\Companion\raw files\temp_screenshot\frame_edges_filtered{count}.png");
 						
 						
 					// Now remove any horizontal edges that are less than 200 pixels long
@@ -467,7 +467,7 @@ public partial class MainNode : Node2D
 							filteredImg.SetPixel(x, y, Colors.Red);
 						}
 					}
-					filteredImg.SavePng($@"C:\Users\sethr\backup\Desktop\Companion\raw files\temp_screenshot\frame_edges_filtered_final{count}.png");
+					//filteredImg.SavePng($@"C:\Users\sethr\backup\Desktop\Companion\raw files\temp_screenshot\frame_edges_filtered_final{count}.png");
 					
 					count++;
 				}
